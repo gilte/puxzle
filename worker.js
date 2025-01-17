@@ -1,4 +1,4 @@
-const { parentPort, workerData } = require('worker_threads');
+const { parentPort } = require('worker_threads');
 const CryptoJS = require('./lib/crypto-js.min.js');
 const elliptic = require('./lib/elliptic.min.js');
 
@@ -27,12 +27,13 @@ parentPort.on('message', async (data) => {
         try {
             // Antes do limite de validação, apenas avança
             if (currentStep < validationThresholdBigInt) {
+                //console.log(`Decimal: ${currentStep} | Hexadecimal: ${currentStep.toString(16)}`);
                 currentStep += getRandomStep();
 
                 if (keysTested % 1000n === 0n) {
                     parentPort.postMessage({
                         type: 'update',
-                        message: `Skipping validation: current step = ${currentStep.toString(16).padStart(64, '0')}\n`,
+                       // message: `Skipping validation: current step = ${currentStep.toString(16).padStart(64, '0')}\n`,
                     });
                 }
                 continue;
@@ -46,23 +47,15 @@ parentPort.on('message', async (data) => {
             // Hashing: SHA-256 seguido de RIPEMD-160
             const sha256Hash = CryptoJS.SHA256(CryptoJS.enc.Hex.parse(publicKey));
             const ripemd160Hash = CryptoJS.RIPEMD160(sha256Hash).toString();
+            
+            
 
             // Log da chave sendo testada
-            process.stdout.write(String.fromCharCode(27) + '[2K' + String.fromCharCode(27) + '[0G');
+            
             // Limpa a linha
             parentPort.postMessage({
                 type: 'update',
-                message: `
-🌌 ============================ SEARCH STATUS ============================ 🌌
-🔍 Target Hash:      ${targetHash}
-🔑 Current Private Key (Hex): ${privateKeyHex}
-🔗 Hash Generated:  ${ripemd160Hash}
-🔄 Range Start:     ${rangeStart}
-🔄 Range End:       ${rangeEnd}
-🚀 Current Step:    ${currentStep.toString()}
-🎲 Random Step:     ${getRandomStep().toString(10)}
-🌌 ======================================================================= 🌌
-                `,
+                message: `Current Private Key (Hex): ${privateKeyHex}`,
             });
 
             if (ripemd160Hash === targetHash) {
@@ -80,7 +73,7 @@ parentPort.on('message', async (data) => {
 
                 parentPort.postMessage({
                     type: 'update',
-                    message: `Keys per second: ${Math.round(keysPerSecond)}`,
+                    message: ` Keys per second: ${Math.round(keysPerSecond)}`,
                 });
 
                 lastUpdateTime = currentTime;
@@ -89,6 +82,7 @@ parentPort.on('message', async (data) => {
         } catch (error) {
             parentPort.postMessage({
                 type: 'error',
+                
                 message: `Error at step ${currentStep.toString(16).padStart(64, '0')}: ${error.message}`,
             });
         }
@@ -100,7 +94,8 @@ parentPort.on('message', async (data) => {
             currentStep = start;
             parentPort.postMessage({
                 type: 'update',
-                message: `Restarting search: current step reset to ${currentStep.toString(16).padStart(64, '0')}`,
+
+                //message: `Restarting search: current step reset to ${currentStep.toString(16).padStart(64, '0')}`,
             });
         }
     }
