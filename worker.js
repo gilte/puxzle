@@ -18,7 +18,7 @@ parentPort.on('message', async (data) => {
     let keysTested = 0;
     let lastUpdateTime = Date.now();
 
-    // Função para gerar um passo aleatório entre stepMin e stepMax
+    
     function getRandomStep() {
         return BigInt(Math.floor(Math.random() * (Number(stepMax - stepMin) + 1)) + Number(stepMin));
     }
