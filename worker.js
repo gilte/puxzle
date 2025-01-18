@@ -25,7 +25,7 @@ parentPort.on('message', async (data) => {
 
     while (currentStep <= end) {
         try {
-            // Antes do limite de validação, apenas avança
+            
             if (currentStep < validationThresholdBigInt) {
                 //console.log(`Decimal: ${currentStep} | Hexadecimal: ${currentStep.toString(16)}`);
                 currentStep += getRandomStep();
