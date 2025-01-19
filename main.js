@@ -20,9 +20,6 @@ rl.question('Enter target hash: ', (targetHash) => {
                         if (startHex >= endHex) throw new Error("Range start must be less than range end.");
                         if (minStepBigInt <= 0n || maxStepBigInt <= 0n || minStepBigInt > maxStepBigInt) throw new Error("Invalid step values.");
 
-                        const totalRange = endHex - startHex;
-                        const validationThreshold = totalRange * 10n / 100n;
-
                         const worker = new Worker('./worker.js');
 
                         worker.on('message', (message) => {
@@ -44,13 +41,13 @@ rl.question('Enter target hash: ', (targetHash) => {
                             rl.close();
                         });
 
+                        // Enviando mensagem sem o validationThreshold
                         worker.postMessage({
                             rangeStart,
                             rangeEnd,
                             targetHash,
                             minStep,
-                            maxStep,
-                            validationThreshold: validationThreshold.toString()
+                            maxStep
                         });
 
                         console.log('Starting search...');
